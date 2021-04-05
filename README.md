@@ -1,10 +1,14 @@
 # discrimiNAT, NTag architecture
 
-[discrimiNAT firewall](https://chasersystems.com/discrimiNAT/) for egress filtering by FQDNs on Google Cloud. Just specify the allowed destination hostnames in the applications' native Firewall Rules and the firewall will take care of the rest.
+[discrimiNAT firewall](https://chasersystems.com/discrimiNAT/) for egress filtering by FQDNs on Google Cloud. Just specify the allowed destination hostnames in the respective applications' native Firewall Rules and the firewall will take care of the rest.
 
 **Architecture with Network Tags in VPCs for fine-grained, opt-in control over routing.**
 
 [Demo Videos](https://chasersystems.com/discrimiNAT/demo/) | [discrimiNAT FAQ](https://chasersystems.com/discrimiNAT/faq/)
+
+## _Pentest_ Ready
+
+discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper _pentest_!
 
 ## Highlights
 
@@ -14,7 +18,7 @@
 
 ## Considerations
 
-* Only one deployment per zone is advised.
+* Only one deployment per zone is advised, and GCP-managed Cloud NAT is not needed with discrimiNAT deployed.
 * VMs _without_ public IPs will need a network tag (output by this module) to access the Internet at all.
 * You must be subscribed to the [discrimiNAT firewall from the Google Cloud Marketplace](https://console.cloud.google.com/marketplace/details/chasersystems-public/discriminat?utm_source=gthb&utm_medium=dcs&utm_campaign=trrfrm).
 
@@ -25,11 +29,12 @@
 ## Next Steps
 
 * [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/discrimiNAT/gcp/quick-start/#v-firewall-rules) after deployment from our main documentation.
-* Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey.
+* Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey  — even on the eve of a _pentest_!
 
 ## Post-deployment Firewall Rule Example
 
 ```hcl
+# These Firewall Rules must be associated with their intended, respective applications.
 resource "google_compute_firewall" "logging_google" {
   name = "logging-google"
 

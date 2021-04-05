@@ -16,7 +16,7 @@ variable "region" {
 
 variable "external_ip_addresses" {
   type        = list(string)
-  description = "Specific, pre-allocated external IP addresses if you wish to use these for egress, NATed traffic. If none specified, ephemeral external IP addressess will be allocated automatically. If specifed, should be equal to the number of zones."
+  description = "Specific, pre-allocated external IP addresses if you wish to use these for egress, NATed traffic. If none specified, ephemeral external IP addressess will be allocated automatically. If specifed, should be equal to the number of zones and NOT be associated with other instances or NAT solutions."
   default     = []
 }
 
@@ -64,7 +64,7 @@ data "google_compute_zones" "auto" {
 }
 
 data "google_compute_image" "discriminat" {
-  name    = "discriminat-2-0-3"
+  family  = "discriminat"
   project = "chasersystems-public"
 }
 
@@ -265,7 +265,7 @@ locals {
 
 output "zonal_network_tags" {
   value       = { for z in local.zones : z => "discriminat-${z}" }
-  description = "Network Tags for filtering traffic through the nearest discrimiNAT firewall instance."
+  description = "Network Tags — to be associated with protected applications — for filtering traffic through the nearest discrimiNAT firewall instance."
 }
 
 ##

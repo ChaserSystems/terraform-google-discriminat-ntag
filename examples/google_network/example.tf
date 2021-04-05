@@ -3,7 +3,7 @@ module "google_network" {
   version = "~> 3.1"
 
   network_name = "my-network"
-  project_id   = "my-nevermind-123456"
+  project_id   = "my-project-123456"
 
   subnets = [
     {
@@ -28,4 +28,9 @@ module "discriminat" {
   }
 
   depends_on = [module.google_network]
+}
+
+output "zonal_network_tags" {
+  value       = module.discriminat["europe-west2/my-subnet"].zonal_network_tags
+  description = "Network Tags — to be associated with protected applications — for filtering traffic through the nearest discrimiNAT firewall instance."
 }
