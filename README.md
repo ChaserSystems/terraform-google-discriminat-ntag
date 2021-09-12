@@ -2,13 +2,15 @@
 
 [discrimiNAT firewall](https://chasersystems.com/discrimiNAT/) for egress filtering by FQDNs on Google Cloud. Just specify the allowed destination hostnames in the respective applications' native Firewall Rules and the firewall will take care of the rest.
 
+![](https://chasersystems.com/media/gcp-protocol-tls.gif)
+
 **Architecture with Network Tags in VPCs for fine-grained, opt-in control over routing.**
 
 [Demo Videos](https://chasersystems.com/discrimiNAT/demo/) | [discrimiNAT FAQ](https://chasersystems.com/discrimiNAT/faq/)
 
-## _Pentest_ Ready
+## Pentest Ready
 
-discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper _pentest_!
+discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper pentest!
 
 ## Highlights
 
@@ -28,8 +30,14 @@ discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 
 ## Next Steps
 
-* [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/discrimiNAT/gcp/quick-start/#v-firewall-rules) after deployment from our main documentation.
-* Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey  — even on the eve of a _pentest_!
+* [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/discrimiNAT/gcp/config-ref/) after deployment from our main documentation.
+* Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey – even on the eve of a pentest!
+
+## Discover
+
+Perhaps use the `see-thru` mode to discover what needs to be in the allowlist for an application, by monitoring its outbound network activity first. Follow our [building an allowlist from scratch](https://chasersystems.com/discrimiNAT/gcp/logs-ref/#building-an-allowlist-from-scratch) recipe for use with StackDriver.
+
+![](https://chasersystems.com/media/gcp-see-thru.gif)
 
 ## Post-deployment Firewall Rule Example
 

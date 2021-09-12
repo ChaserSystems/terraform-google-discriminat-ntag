@@ -265,7 +265,7 @@ locals {
 
 output "zonal_network_tags" {
   value       = { for z in local.zones : z => "discriminat-${z}" }
-  description = "Network Tags — to be associated with protected applications — for filtering traffic through the nearest discrimiNAT firewall instance."
+  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest discrimiNAT firewall instance."
 }
 
 ##

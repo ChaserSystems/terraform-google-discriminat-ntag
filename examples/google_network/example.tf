@@ -32,5 +32,5 @@ module "discriminat" {
 
 output "zonal_network_tags" {
   value       = module.discriminat["europe-west2/my-subnet"].zonal_network_tags
-  description = "Network Tags — to be associated with protected applications — for filtering traffic through the nearest discrimiNAT firewall instance."
+  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest discrimiNAT firewall instance."
 }
