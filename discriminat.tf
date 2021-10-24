@@ -50,6 +50,12 @@ variable "startup_script_base64" {
   default     = ""
 }
 
+variable "custom_service_account_email" {
+  type        = string
+  description = "Override with a specific, custom service account email in case support for features such as Shared VPC is needed. Default is to use the Google Compute Engine service account."
+  default     = null
+}
+
 ##
 
 ## Lookups
@@ -117,8 +123,15 @@ resource "google_compute_instance_template" "discriminat" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
+  }
+
   service_account {
-    scopes = ["compute-ro", "logging-write", "monitoring-write"]
+    email  = var.custom_service_account_email
+    scopes = (var.custom_service_account_email == null) ? ["compute-ro", "logging-write"] : ["cloud-platform"]
   }
 
   labels = local.labels
