@@ -31,6 +31,7 @@ discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 ## Next Steps
 
 * [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/discrimiNAT/gcp/config-ref/) after deployment from our main documentation.
+* If using **Shared VPCs**, read [our guide](https://chasersystems.com/discrimiNAT/gcp/shared-vpc/) on creating and overriding the service account needed for it.
 * Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey – even on the eve of a pentest!
 
 ## Discover
