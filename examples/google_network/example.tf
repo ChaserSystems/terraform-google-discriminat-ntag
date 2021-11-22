@@ -1,6 +1,6 @@
 module "google_network" {
   source  = "terraform-google-modules/network/google"
-  version = "~> 3.1"
+  version = "> 3, < 4"
 
   network_name = "my-network"
   project_id   = "my-project-123456"
