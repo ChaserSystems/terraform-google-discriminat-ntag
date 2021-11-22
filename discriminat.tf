@@ -148,6 +148,8 @@ resource "google_compute_health_check" "discriminat" {
   http_health_check {
     port = 1042
   }
+
+  depends_on = [google_compute_firewall.discriminat-from-healthcheckers]
 }
 
 resource "google_compute_instance_group_manager" "discriminat" {
@@ -270,6 +272,21 @@ locals {
 
 locals {
   zones = length(var.zones_names) > 0 ? var.zones_names : data.google_compute_zones.auto.names
+}
+
+##
+
+## Constraints
+
+terraform {
+  required_version = "> 1, < 2"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "> 3, < 4"
+    }
+  }
 }
 
 ##
