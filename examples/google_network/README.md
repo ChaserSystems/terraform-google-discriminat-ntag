@@ -6,9 +6,6 @@ Demonstrates how to install discrimiNAT egress filtering in a network provisione
 
 See file `example.tf` in the _Source Code_ link above.
 
-## Considerations
+## External IPs
 
-If creating the network and a discrimiNAT deployment at the same time, it may be useful to create just the network first so the discrimiNAT module has a clear idea of the setup. The following sequence of commands are specific to this example in order to resolve a `Invalid count argument` error message, should you encounter it.
-
-1. `terraform apply -target=module.google_network`
-1. `terraform apply`
+External IPs for the NAT function have been defined in a separate file, `eip.tf`, to encourage independent allocation and handling. Although the contents of `eip.tf` will be allocated if `terraform` is run in this directory, users should ensure External IPs are managed separately so they are not accidentally deleted.
