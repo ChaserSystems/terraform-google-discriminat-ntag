@@ -10,6 +10,8 @@ module "discriminat" {
   subnetwork_name = "my-subnetwork"
   region          = "europe-west2"
 
+  #random_deployment_id = true
+
   client_cidrs = ["10.11.12.0/28"]
 
   labels = {
@@ -21,4 +23,9 @@ module "discriminat" {
 output "zonal_network_tags" {
   value       = module.discriminat.zonal_network_tags
   description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest discrimiNAT firewall instance."
+}
+
+output "deployment_id" {
+  value       = module.discriminat.deployment_id
+  description = "In case random_deployment_id was set to true, this is the unique, randomised ID for this deployment that forms a part of the resource names."
 }

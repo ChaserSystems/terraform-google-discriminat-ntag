@@ -73,6 +73,12 @@ variable "image_family" {
   default     = null
 }
 
+variable "random_deployment_id" {
+  type        = bool
+  description = "Set to true to change the region name in resource names to a randomised word. This will be the default behaviour in the next minor version update."
+  default     = false
+}
+
 ##
 
 ## Lookups
@@ -104,14 +110,14 @@ resource "google_compute_address" "discriminat" {
   project    = var.project_id
   subnetwork = var.subnetwork_name
 
-  name         = "discriminat-${local.zones[count.index]}"
+  name         = "discriminat-${local.zonal_name_suffixes[count.index]}"
   address_type = "INTERNAL"
 }
 
 resource "google_compute_instance_template" "discriminat" {
   count = length(local.zones)
 
-  name_prefix = "discriminat-${local.zones[count.index]}-"
+  name_prefix = "discriminat-${local.zonal_name_suffixes[count.index]}-"
   lifecycle {
     create_before_destroy = true
   }
@@ -158,7 +164,7 @@ resource "google_compute_instance_template" "discriminat" {
 }
 
 resource "google_compute_health_check" "discriminat" {
-  name = "discriminat-${var.region}"
+  name = "discriminat-${local.suffix}"
 
   project = var.project_id
 
@@ -179,7 +185,7 @@ resource "google_compute_instance_group_manager" "discriminat" {
 
   project = var.project_id
 
-  name               = "discriminat-${local.zones[count.index]}"
+  name               = "discriminat-${local.zonal_name_suffixes[count.index]}"
   base_instance_name = "discriminat"
   target_size        = 1
 
@@ -213,8 +219,8 @@ resource "google_compute_route" "discriminat" {
 
   project = var.project_id
 
-  name        = "discriminat-${local.zones[count.index]}"
-  tags        = ["discriminat-${local.zones[count.index]}"]
+  name        = "discriminat-${local.zonal_name_suffixes[count.index]}"
+  tags        = ["discriminat-${local.zonal_name_suffixes[count.index]}"]
   dest_range  = "0.0.0.0/0"
   network     = data.google_compute_subnetwork.context.network
   next_hop_ip = google_compute_address.discriminat[count.index].address
@@ -222,7 +228,7 @@ resource "google_compute_route" "discriminat" {
 }
 
 resource "google_compute_firewall" "discriminat-to-internet" {
-  name    = "discriminat-${var.region}-to-internet"
+  name    = "discriminat-${local.suffix}-to-internet"
   network = data.google_compute_subnetwork.context.network
 
   project = var.project_id
@@ -239,7 +245,7 @@ resource "google_compute_firewall" "discriminat-to-internet" {
 }
 
 resource "google_compute_firewall" "discriminat-from-healthcheckers" {
-  name    = "discriminat-${var.region}-from-healthcheckers"
+  name    = "discriminat-${local.suffix}-from-healthcheckers"
   network = data.google_compute_subnetwork.context.network
 
   project = var.project_id
@@ -257,7 +263,7 @@ resource "google_compute_firewall" "discriminat-from-healthcheckers" {
 }
 
 resource "google_compute_firewall" "discriminat-from-clients" {
-  name    = "discriminat-${var.region}-from-clients"
+  name    = "discriminat-${local.suffix}-from-clients"
   network = data.google_compute_subnetwork.context.network
 
   project = var.project_id
@@ -274,7 +280,7 @@ resource "google_compute_firewall" "discriminat-from-clients" {
 }
 
 resource "google_compute_firewall" "discriminat-from-rest" {
-  name    = "discriminat-${var.region}-from-rest"
+  name    = "discriminat-${local.suffix}-from-rest"
   network = data.google_compute_subnetwork.context.network
 
   project = var.project_id
@@ -294,6 +300,18 @@ resource "google_compute_firewall" "discriminat-from-rest" {
 
 ## Locals
 
+resource "random_pet" "deployment_id" {
+  keepers = {
+    region          = var.region
+    subnetwork_name = var.subnetwork_name
+  }
+  length = 1
+}
+
+locals {
+  suffix = var.random_deployment_id ? random_pet.deployment_id.id : var.region
+}
+
 locals {
   labels = merge(
     {
@@ -306,6 +324,10 @@ locals {
 
 locals {
   zones = length(var.zones_names) > 0 ? var.zones_names : data.google_compute_zones.auto.names
+}
+
+locals {
+  zonal_name_suffixes = var.random_deployment_id ? [for z in local.zones : format("${random_pet.deployment_id.id}-%s", substr(z, -1, 1))] : local.zones
 }
 
 ##
@@ -332,8 +354,13 @@ terraform {
 ## Outputs
 
 output "zonal_network_tags" {
-  value       = { for z in local.zones : z => "discriminat-${z}" }
+  value       = { for i, z in local.zones : z => "discriminat-${local.zonal_name_suffixes[i]}" }
   description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest discrimiNAT firewall instance."
+}
+
+output "deployment_id" {
+  value       = var.random_deployment_id ? random_pet.deployment_id.id : null
+  description = "The unique identifier, forming a part of various resource names, for this deployment."
 }
 
 ##
