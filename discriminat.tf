@@ -157,7 +157,7 @@ resource "google_compute_instance_template" "discriminat" {
 
   service_account {
     email  = var.custom_service_account_email
-    scopes = var.custom_service_account_email == null ? ["compute-rw", "logging-write"] : ["cloud-platform"]
+    scopes = var.custom_service_account_email == null ? ["compute-rw", "logging-write", "monitoring-write"] : ["cloud-platform"]
   }
 
   labels = local.labels
