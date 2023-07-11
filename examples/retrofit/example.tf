@@ -12,8 +12,6 @@ module "discriminat" {
 
   #random_deployment_id = true
 
-  client_cidrs = ["10.11.12.0/28"]
-
   labels = {
     "x"   = "y"
     "foo" = "bar"
@@ -22,7 +20,7 @@ module "discriminat" {
 
 output "zonal_network_tags" {
   value       = module.discriminat.zonal_network_tags
-  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest discrimiNAT firewall instance."
+  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest DiscrimiNAT Firewall instance."
 }
 
 output "deployment_id" {
