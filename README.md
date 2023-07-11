@@ -1,16 +1,16 @@
-# discrimiNAT, NTag architecture
+# DiscrimiNAT, NTag architecture
 
-[discrimiNAT firewall](https://chasersystems.com/discriminat) for egress filtering by FQDNs on Google Cloud. Just specify the allowed destination hostnames in the respective applications' native Firewall Rules and the firewall will take care of the rest.
+[DiscrimiNAT Firewall](https://chasersystems.com/discriminat/) is a transparent, proxy-less solution to discover & filter egress traffic by FQDNs in a Shared VPC on Google Cloud. Just specify the allowed destination hostnames in the respective applications' native Firewall Rules and DiscrimiNAT will take care of the rest.
+
+[Watch our 3½ minute egress FQDN discovery video.](https://www.youtube.com/watch?v=Q0ntWv4bA1U)
 
 ![](https://chasersystems.com/img/gcp-protocol-tls.gif)
 
 **Architecture with Network Tags in VPCs for fine-grained, opt-in control over routing.**
 
-[Demo Videos](https://chasersystems.com/discriminat/gcp/demo) | [discrimiNAT FAQ](https://chasersystems.com/discriminat/faq)
-
 ## Pentest Ready
 
-discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper pentest!
+DiscrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper pentest!
 
 ## Highlights
 
@@ -20,9 +20,9 @@ discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 
 ## Considerations
 
-* Only one deployment per zone is advised, and GCP-managed Cloud NAT is not needed with discrimiNAT deployed.
+* Only one deployment per zone is advised, and GCP-managed Cloud NAT is not needed with DiscrimiNAT deployed.
 * VMs _without_ public IPs will need a network tag (output by this module) to access the Internet at all.
-* You must be subscribed to the [discrimiNAT firewall from the Google Cloud Marketplace](https://console.cloud.google.com/marketplace/details/chasersystems-public/discriminat?utm_source=gthb&utm_medium=dcs&utm_campaign=trrfrm).
+* You must be subscribed to the [DiscrimiNAT Firewall from the Google Cloud Marketplace](https://console.cloud.google.com/marketplace/product/chasersystems-public/discriminat).
 
 ## Alternatives
 
@@ -30,23 +30,23 @@ discrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 
 ## External IPs
 
-If a Public IP is not found attached to a discrimiNAT instance, it will look for any allocated but unassociated External IPs that have a label-key named `discriminat` (set to any value.) One of such External IPs will be attempted to be associated with itself then.
+If a Public IP is not found attached to a DiscrimiNAT instance, it will look for any allocated but unassociated External IPs that have a label-key named `discriminat` (set to any value.) One of such External IPs will be attempted to be associated with itself then.
 
 >This allows you to have a stable set of static IPs to share with your partners, who may wish to allowlist/whitelist them.
 
-Private Google Access enabled on the subnet discrimiNAT is deployed in is needed for this mechanism to work though – since making the association needs access to the Compute API. In the [google_network example](examples/google_network/), this is demonstrated by setting `subnet_private_access = true`.
+Private Google Access enabled on the subnet DiscrimiNAT is deployed in is needed for this mechanism to work though – since making the association needs access to the Compute API. In the [google_network example](examples/google_network/), this is demonstrated by setting `subnet_private_access = true`.
 
-It is always possible to not choose this mechanism and have a External IP associated with the network interfaces of the discrimiNAT right from the onset. This also used to be the case before v2.4 of the discrimiNAT.
+It is always possible to not choose this mechanism and have an External IP associated with the network interfaces of the DiscrimiNAT right from the onset. This also used to be the case before v2.4 of the DiscrimiNAT.
 
 ## Next Steps
 
-* [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/docs/discriminat/gcp/config-ref) after deployment from our main documentation.
-* If using **Shared VPCs**, read [our guide](https://chasersystems.com/docs/discriminat/gcp/shared-vpc) on creating and overriding the service account needed for it.
+* [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/docs/discriminat/gcp/config-ref/) after deployment from our main documentation.
+* If using **Shared VPCs**, read [our guide](https://chasersystems.com/docs/discriminat/gcp/shared-vpc/) on creating and overriding the service account needed for it.
 * Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey – even on the eve of a pentest!
 
 ## Discover
 
-Perhaps use the `see-thru` mode to discover what needs to be in the allowlist for an application, by monitoring its outbound network activity first. Follow our [building an allowlist from scratch](https://chasersystems.com/docs/discriminat/gcp/logs-ref#building-an-allowlist-from-scratch) recipe for use with StackDriver.
+Perhaps use the `see-thru` mode to discover what needs to be in the allowlist for an application, by monitoring its outbound network activity first. Follow our [building an allowlist from scratch](https://chasersystems.com/docs/discriminat/gcp/logs-ref/#building-an-allowlist-from-scratch-video-version) recipe for use with StackDriver.
 
 ![](https://chasersystems.com/img/gcp-see-thru.gif)
 
@@ -65,7 +65,7 @@ resource "google_compute_firewall" "logging_google" {
   # Tags of instances this Rule applies to, as usual.
   target_tags = ["foo"]
 
-  # The discrimiNAT firewall will apply its own checks anyway, so you could
+  # The DiscrimiNAT Firewall will apply its own checks anyway, so you could
   # choose to leave destination_ranges not defined without worry.
   # destination_ranges =
 
