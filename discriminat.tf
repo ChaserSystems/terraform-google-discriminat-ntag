@@ -49,7 +49,7 @@ variable "block-project-ssh-keys" {
   default     = true
 }
 
-variable "startup_script_base64" {
+variable "user_data_base64" {
   type        = string
   description = "Strongly suggested to NOT run custom, startup scripts on the firewall instances. But if you had to, supply a base64 encoded version here."
   default     = null
@@ -129,10 +129,9 @@ resource "google_compute_instance_template" "discriminat" {
   machine_type   = var.machine_type
   can_ip_forward = true
 
-  metadata_startup_script = var.startup_script_base64 == null ? null : base64decode(var.startup_script_base64)
-
   metadata = {
     block-project-ssh-keys = var.block-project-ssh-keys
+    user-data              = var.user_data_base64 == null ? null : base64decode(var.user_data_base64)
   }
 
   disk {
