@@ -149,22 +149,12 @@ resource "google_compute_firewall" "sftp_banks" {
 
 ## Automated System Health Reporting
 
-10 minutes after boot and then at 0200 UTC every day, each instance of DiscrimiNAT will collect its OS internals & system logs since instance creation, config changes & traffic flow information from last two hours and upload it to a Chaser-owned cloud bucket. This information is encrypted at rest with a certain public key so only relevant individuals with access to the corresponding private key can decrypt it. The transfer is encrypted over TLS.
+10 minutes after boot, at 0200 UTC every day and once at shutdown, each instance of DiscrimiNAT will collect its OS internals & system logs since instance creation, config changes & traffic flow information from last two hours and upload it to a Chaser-owned cloud bucket. This information is encrypted at rest with a certain public key so only relevant individuals with access to the corresponding private key can decrypt it. The transfer is encrypted over TLS.
 
 Access to this information is immensely useful to create a faster and more reliable DiscrimiNAT as we add new features. We also aim to learn about how users are interacting with the product in order to further improve the usability of it as they embark on a very ambitious journey of fully accounted for and effective egress controls.
 
-We understand if certain environments within your deployment would rather not have this turned on. **To disable it,** a file at the path `/etc/chaser/disable_automated-system-health-reporting` should exist. From our Terraform module v2.7.0 onwards, this can be accomplished by including the following statement:
+We understand if certain environments within your deployment would rather not have this turned on. **To disable it,** a file at the path `/etc/chaser/disable_automated-system-health-reporting` should exist. From our Terraform module v2.7.1 onwards, this can be accomplished by setting the variable `ashr` to `false`:
 
 ```
-user_data_base64 = "I2Nsb3VkLWNvbmZpZwp3cml0ZV9maWxlczoKLSBwYXRoOiAvZXRjL2NoYXNlci9kaXNhYmxlX2F1dG9tYXRlZC1zeXN0ZW0taGVhbHRoLXJlcG9ydGluZwo="
+ashr = false
 ```
-
-The _base64_ value above decodes to:
-
-```
-#cloud-config
-write_files:
-- path: /etc/chaser/disable_automated-system-health-reporting
-```
-
-Which is a [cloud-init](https://cloudinit.readthedocs.io/en/latest/reference/examples.html) way of creating that file in the instance.
