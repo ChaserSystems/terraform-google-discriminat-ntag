@@ -5,7 +5,7 @@ variable "project_id" {
 
 module "google_network" {
   source  = "terraform-google-modules/network/google"
-  version = "> 3, < 4"
+  version = "> 3, < 10"
 
   network_name = "discriminat-example"
   project_id   = var.project_id
