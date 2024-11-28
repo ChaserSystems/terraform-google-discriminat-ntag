@@ -19,6 +19,21 @@ variable "region" {
 
 ## Defaults
 
+variable "preferences" {
+  type        = string
+  description = "Default preferences. See docs at https://chasersystems.com/docs/discriminat/gcp/default-prefs/"
+  default     = <<EOF
+{
+  "%default": {
+    "wildcard_exposure": "prohibit_public_suffix",
+    "flow_log_verbosity": "full",
+    "see_thru": null,
+    "x509_crls": "ignore"
+  }
+}
+  EOF
+}
+
 variable "zones_names" {
   type        = list(string)
   description = "Specific zones if you wish to override the default behaviour. If not overridden, defaults to all zones found in the specified region."
@@ -57,25 +72,37 @@ variable "user_data_base64" {
 
 variable "custom_service_account_email" {
   type        = string
-  description = "Override with a specific, custom service account email in case support for architectures with Shared VPC and/or Serverless VPC Access is needed. Default is to use the Google Compute Engine service account."
+  description = "Override with a specific, custom service account email in case support for architectures with Shared VPC and/or Serverless VPC Access is needed. Default is to use the Google Compute Engine service account. See docs at https://chasersystems.com/docs/discriminat/gcp/service-account/"
   default     = null
 }
 
 variable "image_project" {
   type        = string
   description = "Reserved for use with Chaser support. Allows overriding the source image project for DiscrimiNAT."
-  default     = null
+  default     = "chasersystems-public"
 }
 
 variable "image_family" {
   type        = string
+  description = "Reserved for use with Chaser support. Allows overriding the source image family for DiscrimiNAT."
+  default     = "discriminat"
+}
+
+variable "image_version" {
+  type        = string
   description = "Reserved for use with Chaser support. Allows overriding the source image version for DiscrimiNAT."
-  default     = null
+  default     = "2.9.0"
+}
+
+variable "image_auto_update" {
+  type        = bool
+  description = "Automatically look up and use the latest version of DiscrimiNAT image available from `image_project` of `image_family`. When this is set to `true`, `image_version` is ignored. When this is set to `false`, `image_family` is ignored."
+  default     = true
 }
 
 variable "random_deployment_id" {
   type        = bool
-  description = "Set to true to change the region name in resource names to a randomised word. This will be the default behaviour in the next minor version update."
+  description = "Set to true to change the region name in resource names to a randomised word."
   default     = false
 }
 
@@ -89,7 +116,7 @@ variable "byol" {
 variable "ashr" {
   type        = bool
   default     = true
-  description = "Automated System Health Reporting. See note in README to learn more. Set to false to disable. Default is true and hence enabled."
+  description = "Automated System Health Reporting. See note in README to learn more. Set to `false` to disable. Default is `true` and hence enabled."
 }
 
 ##
@@ -108,8 +135,28 @@ data "google_compute_zones" "auto" {
 }
 
 data "google_compute_image" "discriminat" {
-  family  = var.image_family == null ? "discriminat" : var.image_family
-  project = var.image_project == null ? "chasersystems-public" : var.image_project
+  name    = var.image_auto_update ? null : format("discriminat-%s", replace(var.image_version, ".", "-"))
+  family  = var.image_auto_update ? var.image_family : null
+  project = var.image_project
+}
+
+##
+
+## Preferences
+
+resource "google_secret_manager_secret" "preferences" {
+  secret_id = "DiscrimiNAT_${local.suffix}"
+
+  project = var.project_id
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "default" {
+  secret      = google_secret_manager_secret.preferences.id
+  secret_data = var.preferences
 }
 
 ##
@@ -328,7 +375,8 @@ locals {
   labels = merge(
     {
       "product" : "discriminat",
-      "vendor" : "chasersystems_com"
+      "vendor" : "chasersystems_com",
+      "discriminat" : local.suffix
     },
     var.labels
   )
@@ -365,11 +413,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "> 3, < 6"
+      version = "> 3, < 7"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "> 3, < 6"
+      version = "> 3, < 7"
     }
   }
 }
@@ -386,6 +434,11 @@ output "zonal_network_tags" {
 output "deployment_id" {
   value       = var.random_deployment_id ? random_pet.deployment_id.id : null
   description = "The unique identifier, forming a part of various resource names, for this deployment."
+}
+
+output "default_preferences" {
+  value       = nonsensitive(google_secret_manager_secret_version.default.secret_data)
+  description = "The default preferences supplied to DiscrimiNAT. See docs at https://chasersystems.com/docs/discriminat/gcp/default-prefs/"
 }
 
 ##
