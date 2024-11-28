@@ -10,7 +10,17 @@ module "discriminat" {
   subnetwork_name = "my-subnetwork"
   region          = "europe-west2"
 
-  #random_deployment_id = true
+  # random_deployment_id = true
+
+  # custom_service_account_email = "some-name@some-project.iam.gserviceaccount.com"
+
+  # preferences = <<EOF
+  # {
+  #   "%default": {
+  #     "flow_log_verbosity": "only_disallowed"
+  #   }
+  # }
+  # EOF
 
   labels = {
     "x"   = "y"
@@ -26,4 +36,9 @@ output "zonal_network_tags" {
 output "deployment_id" {
   value       = module.discriminat.deployment_id
   description = "In case random_deployment_id was set to true, this is the unique, randomised ID for this deployment that forms a part of the resource names."
+}
+
+output "default_preferences" {
+  value       = module.discriminat.default_preferences
+  description = "The default preferences supplied to DiscrimiNAT. See docs at https://chasersystems.com/docs/discriminat/gcp/default-prefs/"
 }
