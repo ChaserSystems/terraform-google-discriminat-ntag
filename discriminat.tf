@@ -102,7 +102,7 @@ variable "image_family" {
 variable "image_version" {
   type        = string
   description = "Reserved for use with Chaser support. Allows overriding the source image version for DiscrimiNAT."
-  default     = "2.9.0"
+  default     = "2.20"
 }
 
 variable "image_auto_update" {
