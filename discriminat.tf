@@ -40,6 +40,17 @@ variable "zones_names" {
   default     = []
 }
 
+variable "bypass_cidrs" {
+  type        = map(any)
+  description = "Destination CIDRs that should be routed directly to the default internet gateway, thereby bypassing the default route via DiscrimiNAT. The routes for these destination CIDRs are created with a higher priority than the default route via DiscrimiNAT. For Private IP workloads to be able to connect to these destination ranges, they will need to have routing in place, which usually just works for Google Cloud operated Public IP CIDRs (with or without Cloud NAT in the VPC). Note that this is not a way to allow traffic via DiscrimiNAT."
+  default = {
+    gcp-grpc-direct-conn = {
+      dest_range  = "34.126.0.0/18"
+      description = "https://cloud.google.com/storage/docs/direct-connectivity"
+    }
+  }
+}
+
 variable "client_cidrs" {
   type        = list(string)
   description = "Additional CIDR blocks of clients which should be able to connect to, and hence route via, DiscrimiNAT instances. Defaults to RFC1918 ranges."
@@ -150,8 +161,14 @@ resource "google_secret_manager_secret" "preferences" {
   project = var.project_id
 
   replication {
-    auto {}
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
+
+  labels = local.labels
 }
 
 resource "google_secret_manager_secret_version" "default" {
@@ -286,6 +303,19 @@ resource "google_compute_route" "discriminat" {
   priority    = 200
 }
 
+resource "google_compute_route" "bypass_cidrs" {
+  for_each = var.bypass_cidrs
+
+  name        = "${local.suffix}-${each.key}-bypass"
+  description = each.value.description
+  project     = var.project_id
+
+  dest_range       = each.value.dest_range
+  network          = data.google_compute_subnetwork.context.network
+  next_hop_gateway = "default-internet-gateway"
+  priority         = 150
+}
+
 resource "google_compute_firewall" "discriminat-to-internet" {
   name    = "discriminat-${local.suffix}-to-internet"
   network = data.google_compute_subnetwork.context.network
@@ -317,6 +347,24 @@ resource "google_compute_firewall" "discriminat-from-healthcheckers" {
 
   allow {
     protocol = "tcp"
+    ports    = [1042]
+  }
+}
+
+resource "google_compute_firewall" "discriminat-from-discriminats" {
+  name    = "discriminat-${local.suffix}-from-discriminats"
+  project = var.project_id
+
+  network = data.google_compute_subnetwork.context.network
+
+  direction = "INGRESS"
+  priority  = 200
+
+  source_tags = ["discriminat-itself"]
+  target_tags = ["discriminat-itself"]
+
+  allow {
+    protocol = "udp"
     ports    = [1042]
   }
 }
@@ -413,10 +461,6 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "> 3, < 7"
-    }
-    google-beta = {
-      source  = "hashicorp/google-beta"
       version = "> 3, < 7"
     }
   }
