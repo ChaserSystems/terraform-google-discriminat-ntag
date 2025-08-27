@@ -5,7 +5,7 @@ variable "project_id" {
 
 module "google_network" {
   source  = "terraform-google-modules/network/google"
-  version = "> 3, < 10"
+  version = "> 3, < 12"
 
   network_name = "discriminat-example"
   project_id   = var.project_id
@@ -31,13 +31,14 @@ module "discriminat" {
 
   # custom_service_account_email = "some-name@some-project.iam.gserviceaccount.com"
 
-  # preferences = <<EOF
-  # {
-  #   "%default": {
-  #     "flow_log_verbosity": "only_disallowed"
-  #   }
-  # }
-  # EOF
+  preferences = <<EOF
+  {
+    "%default": {
+      "flow_log_verbosity": "full",
+      "see_thru": "2026-01-19"
+    }
+  }
+  EOF
 
   labels = {
     "x"   = "y"
