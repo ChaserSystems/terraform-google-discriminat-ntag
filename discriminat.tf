@@ -7,7 +7,7 @@ variable "project_id" {
 
 variable "subnetwork_name" {
   type        = string
-  description = "The name of the subnetwork to deploy the DiscrimiNAT Firewall instances in. This must already exist."
+  description = "The name of the subnetwork to deploy the DiscrimiNAT Firewall instances in. This must already exist and have \"Private Google Access\" turned on."
 }
 
 variable "region" {
@@ -41,7 +41,7 @@ variable "zones_names" {
 }
 
 variable "bypass_cidrs" {
-  type        = map(any)
+  type        = map(map(string))
   description = "Destination CIDRs that should be routed directly to the default internet gateway, thereby bypassing the default route via DiscrimiNAT. The routes for these destination CIDRs are created with a higher priority than the default route via DiscrimiNAT. For Private IP workloads to be able to connect to these destination ranges, they will need to have routing in place, which usually just works for Google Cloud operated Public IP CIDRs (with or without Cloud NAT in the VPC). Note that this is not a way to allow traffic via DiscrimiNAT."
   default = {
     gcp-grpc-direct-conn = {
@@ -58,7 +58,7 @@ variable "client_cidrs" {
 }
 
 variable "labels" {
-  type        = map(any)
+  type        = map(string)
   description = "Map of key-value label pairs to apply to resources created by this module. See examples for use."
   default     = {}
 }
@@ -424,7 +424,8 @@ locals {
     {
       "product" : "discriminat",
       "vendor" : "chasersystems_com",
-      "discriminat" : local.suffix
+      "discriminat" : local.suffix,
+      "goog-partner-solution" : "isol_plb32_0014m00001k39ovqai_vqj2nlpx4j3y3ubjk2pxkpkeeiuvvemk"
     },
     var.labels
   )
