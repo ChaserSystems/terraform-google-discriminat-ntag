@@ -7,7 +7,7 @@ variable "project_id" {
 
 variable "subnetwork_name" {
   type        = string
-  description = "The name of the subnetwork to deploy the DiscrimiNAT Firewall instances in. This must already exist and have \"Private Google Access\" turned on."
+  description = "The name of the subnetwork to deploy the DiscrimiNAT Firewall instances in. This must already exist and have `Private Google Access` turned on."
 }
 
 variable "region" {
@@ -65,7 +65,7 @@ variable "labels" {
 
 variable "machine_type" {
   type        = string
-  description = "The default of `e2-small` should suffice for light to medium levels of usage. Anything less than 2 CPU cores and 2 GB of RAM is not recommended. For faster access to the Internet and for projects with a large number of VMs, you may want to upgrade to `n2-highcpu-2` or `n2d-highcpu-2`."
+  description = "The default of `e2-small` should suffice for light to medium levels of usage. Anything less than 2 CPU cores and 2 GB of RAM is not recommended. For faster access to the Internet, hundreds of FQDNs in the allowlists, projects with a large number of VMs, or more than a few Service Projects using a Shared VPC, you should upgrade to `n2-highcpu-2` or `n2d-highcpu-2`."
   default     = "e2-small"
 }
 
@@ -83,7 +83,7 @@ variable "user_data_base64" {
 
 variable "custom_service_account_email" {
   type        = string
-  description = "Override with a specific, custom service account email in case support for architectures with Shared VPC and/or Serverless VPC Access is needed. Default is to use the Google Compute Engine service account. See docs at https://chasersystems.com/docs/discriminat/gcp/service-account/"
+  description = "Set DiscrimiNAT's service account to a specific, custom service account email in case support for architectures with Shared VPC and/or Serverless VPC Access is needed. Default is to use the Google Compute Engine service account. See docs at https://chasersystems.com/docs/discriminat/gcp/service-account/"
   default     = null
 }
 
@@ -102,7 +102,7 @@ variable "image_family" {
 variable "image_version" {
   type        = string
   description = "Reserved for use with Chaser support. Allows overriding the source image version for DiscrimiNAT."
-  default     = "2.30"
+  default     = "2.40"
 }
 
 variable "image_auto_update" {
@@ -168,7 +168,8 @@ resource "google_secret_manager_secret" "preferences" {
     }
   }
 
-  labels = local.labels
+  labels      = local.labels
+  annotations = local.metadata
 }
 
 resource "google_secret_manager_secret_version" "default" {
@@ -206,10 +207,13 @@ resource "google_compute_instance_template" "discriminat" {
   machine_type   = var.machine_type
   can_ip_forward = true
 
-  metadata = {
+  metadata = merge({
     block-project-ssh-keys = var.block-project-ssh-keys
     user-data              = var.user_data_base64 != null ? base64decode(var.user_data_base64) : local.cloud_config == "" ? null : local.cloud_config
-  }
+    }
+    ,
+    local.metadata
+  )
 
   disk {
     source_image = data.google_compute_image.discriminat.self_link
@@ -424,11 +428,20 @@ locals {
     {
       "product" : "discriminat",
       "vendor" : "chasersystems_com",
+      "documentation" : "chasersystems_com_docs",
+      "llms_txt" : "chasersystems_com_llms_txt",
       "discriminat" : local.suffix,
       "goog-partner-solution" : "isol_plb32_0014m00001k39ovqai_vqj2nlpx4j3y3ubjk2pxkpkeeiuvvemk"
     },
     var.labels
   )
+}
+
+locals {
+  metadata = {
+    "documentation" : "https://chasersystems.com/docs/",
+    "llms_txt" : "https://chasersystems.com/llms.txt",
+  }
 }
 
 locals {

@@ -18,7 +18,7 @@ module "discriminat" {
   {
     "%default": {
       "flow_log_verbosity": "full",
-      "see_thru": "2026-01-19"
+      "see_thru": "2026-12-19"
     }
   }
   EOF

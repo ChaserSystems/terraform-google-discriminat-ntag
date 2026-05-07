@@ -1,8 +1,10 @@
-# DiscrimiNAT, NTag architecture
+# DiscrimiNAT Firewall, NTag architecture
 
-[DiscrimiNAT Firewall](https://chasersystems.com/discriminat/) is a transparent, proxy-less solution to discover & filter egress traffic by FQDNs in a Shared VPC on Google Cloud. Just specify the allowed destination hostnames in the respective applications' native Firewall Rules and DiscrimiNAT will take care of the rest.
+[DiscrimiNAT Firewall](https://chasersystems.com/discriminat/) is a transparent, proxy-less solution to discover & filter egress traffic by FQDNs in a Shared VPC on Google Cloud. Just specify the allowed destination hostnames in the respective apps' native Firewall Rules and DiscrimiNAT will take care of the rest.
 
 [Watch our 3½ minute egress FQDN discovery video.](https://www.youtube.com/watch?v=Q0ntWv4bA1U)
+
+[Product Reviews at G2](https://www.g2.com/products/discriminat-firewall/reviews) | [FAQ](https://chasersystems.com/discriminat/faq/) | [LLMS_TXT](https://chasersystems.com/llms.txt)
 
 ![](https://chasersystems.com/img/gcp-protocol-tls.gif)
 
@@ -10,7 +12,7 @@
 
 ## Pentest Ready
 
-DiscrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS, for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper pentest!
+DiscrimiNAT enforces the use of contemporary encryption standards such as TLS 1.2+ and SSH v2 with bidirectional in-band checks. Anything older or insecure will be denied connection automatically. Also conducts out-of-band checks, such as DNS (to mitigate SNI spoofing), for robust defence against sophisticated malware and insider threats. Gets your VPC ready for a proper pentest!
 
 ## Highlights
 
@@ -32,7 +34,7 @@ DiscrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 
 If a Public IP is not found attached to a DiscrimiNAT instance, it will look for any allocated but unassociated External IPs that have a label-key named `discriminat` (set to any value.) One of such External IPs will be attempted to be associated with itself then.
 
->This allows you to have a stable set of static IPs to share with your partners, who may wish to allowlist/whitelist them.
+>This allows you to have a stable set of static IPs to share with your partners, who may wish to allowlist them.
 
 Private Google Access enabled on the subnet DiscrimiNAT is deployed in is needed for this mechanism to work though – since making the association needs access to the Compute API. In the [google_network example](examples/google_network/), this is demonstrated by setting `subnet_private_access = true`.
 
@@ -41,7 +43,7 @@ It is always possible to not choose this mechanism and have an External IP assoc
 ## Next Steps
 
 * [Understand how to configure the enhanced Firewall Rules](https://chasersystems.com/docs/discriminat/gcp/config-ref/) after deployment from our main documentation.
-* If using **Shared VPCs**, read [our guide](https://chasersystems.com/docs/discriminat/gcp/shared-vpc/) on creating and overriding the service account needed for it.
+* If using **Shared VPCs**, read [our guide](https://chasersystems.com/docs/discriminat/gcp/shared-vpc/) on creating the service account needed for it.
 * Contact our DevSecOps at devsecops@chasersystems.com for queries at any stage of your journey – even on the eve of a pentest!
 
 ## Discover
@@ -75,7 +77,7 @@ resource "google_compute_firewall" "logging_google" {
   }
 
   # You could simply embed an allowed FQDN, like below.
-  # Full syntax at https://chasersystems.com/docs/discriminat/gcp/config-ref
+  # Full syntax at https://chasersystems.com/docs/discriminat/gcp/config-ref/
   description = "discriminat:tls:logging.googleapis.com"
 }
 
@@ -92,7 +94,7 @@ resource "google_compute_firewall" "saas_monitoring" {
   }
 
   # Or you could embed a few allowed FQDNs, comma-separated, like below.
-  # Full syntax at https://chasersystems.com/docs/discriminat/gcp/config-ref
+  # Full syntax at https://chasersystems.com/docs/discriminat/gcp/config-ref/
   description = "discriminat:tls:app.datadoghq.com,collector.newrelic.com"
 }
 
@@ -151,7 +153,7 @@ resource "google_compute_firewall" "sftp_banks" {
 
 10 minutes after boot, a few minutes before 0200 UTC every day and once at shutdown, each instance of DiscrimiNAT will collect its OS internals & system logs since instance creation, config changes & traffic flow information from last two hours and upload it to a Chaser-owned cloud bucket. This information is encrypted at rest with a certain public key so only relevant individuals with access to the corresponding private key can decrypt it. The transfer is encrypted over TLS.
 
-Access to this information is immensely useful to create a faster and more reliable DiscrimiNAT as we add new features. We also aim to learn about how users are interacting with the product in order to further improve the usability of it as they embark on a very ambitious journey of fully accounted for and effective egress controls.
+Access to this information is immensely useful to create a faster and more reliable DiscrimiNAT as we add new features. We also aim to learn about how users interact with the product in order to further improve the usability of it as they embark on a very ambitious journey of fully accounted for and effective egress controls.
 
 We understand if certain environments within your deployment would rather not have this turned on. **To disable it,** a file at the path `/etc/chaser/disable_automated-system-health-reporting` should exist. From our Terraform module v2.7.1 onwards, this can be accomplished by setting the variable `ashr` to `false`:
 
