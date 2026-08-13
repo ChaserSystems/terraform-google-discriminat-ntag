@@ -1,6 +1,8 @@
-# DiscrimiNAT Firewall, NTag architecture
+# DiscrimiNAT OTF, NTag architecture
 
-[DiscrimiNAT Firewall](https://chasersystems.com/discriminat/) is a transparent, proxy-less solution to discover & filter egress traffic by FQDNs in a Shared VPC on Google Cloud. Just specify the allowed destination hostnames in the respective apps' native Firewall Rules and DiscrimiNAT will take care of the rest.
+OTF means **Outbound Traffic Filtering**. Also see [MITRE D3FEND D3-OTF](https://d3fend.mitre.org/technique/d3f:OutboundTrafficFiltering/).
+
+[DiscrimiNAT OTF](https://chasersystems.com/discriminat/) is a transparent, proxy-less solution to discover & filter egress traffic by FQDNs in a Shared VPC on Google Cloud. Just specify the allowed destination hostnames in the respective apps' native Firewall Rules and DiscrimiNAT will take care of the rest.
 
 [Watch our 3½ minute egress FQDN discovery video.](https://www.youtube.com/watch?v=Q0ntWv4bA1U)
 
@@ -24,7 +26,7 @@ DiscrimiNAT enforces the use of contemporary encryption standards such as TLS 1.
 
 * Only one deployment per zone is advised, and GCP-managed Cloud NAT is not needed with DiscrimiNAT deployed.
 * VMs _without_ public IPs will need a network tag (output by this module) to access the Internet at all.
-* You must be subscribed to the [DiscrimiNAT Firewall from the Google Cloud Marketplace](https://console.cloud.google.com/marketplace/product/chasersystems-public/discriminat).
+* You must be subscribed to the [DiscrimiNAT OTF from the Google Cloud Marketplace](https://console.cloud.google.com/marketplace/product/chasersystems-public/discriminat).
 
 ## Alternatives
 
@@ -67,7 +69,7 @@ resource "google_compute_firewall" "logging_google" {
   # Tags of instances this Rule applies to, as usual.
   target_tags = ["foo"]
 
-  # The DiscrimiNAT Firewall will apply its own checks anyway, so you could
+  # DiscrimiNAT OTF will apply its own checks anyway, so you could
   # choose to leave destination_ranges not defined without worry.
   # destination_ranges =
 

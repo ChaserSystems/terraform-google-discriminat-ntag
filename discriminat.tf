@@ -7,7 +7,7 @@ variable "project_id" {
 
 variable "subnetwork_name" {
   type        = string
-  description = "The name of the subnetwork to deploy the DiscrimiNAT Firewall instances in. This must already exist and have `Private Google Access` turned on."
+  description = "The name of the subnetwork to deploy DiscrimiNAT instances in. This must already exist and have `Private Google Access` turned on."
 }
 
 variable "region" {
@@ -102,7 +102,7 @@ variable "image_family" {
 variable "image_version" {
   type        = string
   description = "Reserved for use with Chaser support. Allows overriding the source image version for DiscrimiNAT."
-  default     = "2.40"
+  default     = "2.50"
 }
 
 variable "image_auto_update" {
@@ -486,7 +486,7 @@ terraform {
 
 output "zonal_network_tags" {
   value       = { for i, z in local.zones : z => "discriminat-${local.zonal_name_suffixes[i]}" }
-  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest DiscrimiNAT Firewall instance."
+  description = "Network Tags – to be associated with protected applications – for filtering traffic through the nearest DiscrimiNAT instance."
 }
 
 output "deployment_id" {
