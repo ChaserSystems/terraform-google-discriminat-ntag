@@ -69,6 +69,12 @@ variable "machine_type" {
   default     = "e2-small"
 }
 
+variable "disk_type" {
+  type        = string
+  description = "The default of `pd-ssd` should work with most machine types including `n2-`. `n4-` machine types only support `hyperdisk-balanced`, though, so the user may want to override it here."
+  default     = "pd-ssd"
+}
+
 variable "block-project-ssh-keys" {
   type        = bool
   description = "Strongly suggested to leave this to the default, that is to NOT allow project-wide SSH keys to login into the firewall."
@@ -217,7 +223,7 @@ resource "google_compute_instance_template" "discriminat" {
 
   disk {
     source_image = data.google_compute_image.discriminat.self_link
-    disk_type    = "pd-ssd"
+    disk_type    = var.disk_type
     auto_delete  = true
     boot         = true
   }
